@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coloring — Fret and Ink</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #000; color: #fff; font-family: Arial, Helvetica, sans-serif; }
+  a { color: #FF0175; }
+  header { padding: 14px 16px 8px; text-align: center; }
+  header h1 { margin: 0; font-size: clamp(26px, 6vw, 40px); letter-spacing: 2px; color: #FF0175; text-transform: uppercase; }
+  header p { margin: 6px 0 0; color: #FFACEC; font-size: 14px; }
+  .back { display: inline-block; margin: 10px 0 0; color: #FF0175; font-weight: 700; text-decoration: none; border: 2px solid #FF0175; border-radius: 999px; padding: 6px 14px; font-size: 14px; }
+  .back:hover { background: #FF0175; color: #000; }
+  #toolbar { position: sticky; top: 0; z-index: 10; background: #000; border-top: 2px solid #FF0175; border-bottom: 2px solid #FF0175; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+  #palette { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #fff; cursor: pointer; padding: 0; }
+  .swatch[aria-pressed="true"] { outline: 3px solid #FF0175; outline-offset: 2px; }
+  .toolbtn { background: #000; color: #FF0175; border: 2px solid #FF0175; border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+  .toolbtn:hover, .toolbtn[aria-pressed="true"] { background: #FF0175; color: #000; }
+  .toolbtn:disabled { opacity: .4; cursor: default; }
+  .toolbtn:disabled:hover { background: #000; color: #FF0175; }
+  #stage { max-width: 760px; margin: 0 auto; padding: 14px 12px 30px; }
+  #pageLabel { text-align: center; color: #FFACEC; font-weight: 700; margin: 4px 0 10px; font-size: 15px; }
+  #canvasWrap { background: #fff; border: 3px solid #FF0175; border-radius: 8px; overflow: hidden; touch-action: none; }
+  #colorCanvas { display: block; width: 100%; height: auto; cursor: crosshair; }
+  #pickerTitle { text-align: center; color: #FF0175; font-weight: 700; margin: 22px 0 10px; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; }
+  #picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
+  .thumb { background: #fff; border: 2px solid #333; border-radius: 6px; padding: 0; cursor: pointer; overflow: hidden; aspect-ratio: 1 / 1; }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb[aria-pressed="true"] { border-color: #FF0175; box-shadow: 0 0 0 2px #FF0175; }
+  .thumb span { display: block; background: #000; color: #FF0175; font-size: 11px; font-weight: 700; text-align: center; padding: 2px 0; }
+  #status { text-align: center; color: #888; font-size: 13px; margin-top: 14px; min-height: 18px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Coloring</h1>
+  <p>Tap a page, pick a color, tap a space to fill it in.</p>
+  <a class="back" href="../index.html">&larr; Back to the bookshelf</a>
+</header>
+
+<div id="toolbar">
+  <div id="palette" role="group" aria-label="Colors"></div>
+  <button type="button" class="toolbtn" id="eraserBtn" aria-pressed="false">Eraser</button>
+  <button type="button" class="toolbtn" id="undoBtn" disabled>Undo</button>
+  <button type="button" class="toolbtn" id="clearBtn">Clear</button>
+  <button type="button" class="toolbtn" id="saveBtn">Save picture</button>
+</div>
+
+<div id="stage">
+  <div id="pageLabel">Page 1 of 100</div>
+  <div id="canvasWrap"><canvas id="colorCanvas" width="1000" height="1000"></canvas></div>
+  <div id="pickerTitle">Pick a page</div>
+  <div id="picker"></div>
+  <div id="status"></div>
+</div>
+
+<script>
+(function () {
+  var TOTAL = 100;
+  var MAX_DIM = 1000;
+  var canvas = document.getElementById('colorCanvas');
+  var ctx = canvas.getContext('2d');
+  var paletteEl = document.getElementById('palette');
+  var pageLabel = document.getElementById('pageLabel');
+  var pickerEl = document.getElementById('picker');
+  var statusEl = document.getElementById('status');
+  var undoBtn = document.getElementById('undoBtn');
+  var clearBtn = document.getElementById('clearBtn');
+  var saveBtn = document.getElementById('saveBtn');
+  var eraserBtn = document.getElementById('eraserBtn');
+
+  var COLORS = [
+    '#FF0175', '#FFACEC', '#FF0000', '#FF6B00', '#FFC800',
+    '#2FBF2F', '#00A86B', '#00BFFF', '#0057FF', '#7B2FFF',
+    '#B388FF', '#FF6B9D', '#8B4513', '#C89B6A', '#FFD1DC',
+    '#000000', '#666666', '#FFFFFF', '#FFFF00', '#00FFFF'
+  ];
+  var currentColor = COLORS[0];
+  var erasing = false;
+  var undoStack = [];
+  var currentPage = 1;
+  var baseImageData = null; // clean thresholded line art
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function pageUrl(n) { return 'pages/p' + pad(n) + '.webp'; }
+
+  function setStatus(msg) { statusEl.textContent = msg || ''; }
+
+  // Build palette
+  COLORS.forEach(function (c, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'swatch';
+    b.style.background = c;
+    b.setAttribute('aria-label', 'Color ' + c);
+    b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    b.addEventListener('click', function () {
+      currentColor = c;
+      erasing = false;
+      eraserBtn.setAttribute('aria-pressed', 'false');
+      var all = paletteEl.querySelectorAll('.swatch');
+      for (var k = 0; k < all.length; k++) all[k].setAttribute('aria-pressed', 'false');
+      b.setAttribute('aria-pressed', 'true');
+    });
+    paletteEl.appendChild(b);
+  });
+
+  // Build picker (100 thumbnails)
+  for (var p = 1; p <= TOTAL; p++) {
+    (function (n) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'thumb';
+      btn.setAttribute('aria-pressed', n === 1 ? 'true' : 'false');
+      btn.setAttribute('aria-label', 'Page ' + n);
+      var img = document.createElement('img');
+      img.src = pageUrl(n);
+      img.alt = 'Coloring page ' + n;
+      img.loading = 'lazy';
+      var cap = document.createElement('span');
+      cap.textContent = n;
+      btn.appendChild(img);
+      btn.appendChild(cap);
+      btn.addEventListener('click', function () { loadPage(n); });
+      pickerEl.appendChild(btn);
+    })(p);
+  }
+
+  function markSelected(n) {
+    var thumbs = pickerEl.querySelectorAll('.thumb');
+    for (var i = 0; i < thumbs.length; i++) {
+      thumbs[i].setAttribute('aria-pressed', (i + 1) === n ? 'true' : 'false');
+    }
+  }
+
+  function hexToRgb(hex) {
+    var h = hex.replace('#', '');
+    return [parseInt(h.substr(0, 2), 16), parseInt(h.substr(2, 2), 16), parseInt(h.substr(4, 2), 16)];
+  }
+
+  function isLine(r, g, b) {
+    // After thresholding, lines are pure black. Treat anything clearly dark as a line.
+    return (r + g + b) / 3 < 120;
+  }
+
+  function loadPage(n) {
+    currentPage = n;
+    pageLabel.textContent = 'Page ' + n + ' of ' + TOTAL;
+    markSelected(n);
+    undoStack = [];
+    undoBtn.disabled = true;
+    setStatus('Loading page ' + n + '...');
+    var img = new Image();
+    img.onload = function () {
+      var w = img.naturalWidth, h = img.naturalHeight;
+      var scale = Math.min(1, MAX_DIM / Math.max(w, h));
+      var dw = Math.max(1, Math.round(w * scale));
+      var dh = Math.max(1, Math.round(h * scale));
+      canvas.width = dw;
+      canvas.height = dh;
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0, 0, dw, dh);
+      ctx.drawImage(img, 0, 0, dw, dh);
+      // Threshold to pure black/white so flood fill has crisp boundaries.
+      var id = ctx.getImageData(0, 0, dw, dh);
+      var d = id.data;
+      for (var i = 0; i < d.length; i += 4) {
+        var lum = (d[i] + d[i + 1] + d[i + 2]) / 3;
+        var v = lum < 200 ? 0 : 255;
+        d[i] = v; d[i + 1] = v; d[i + 2] = v; d[i + 3] = 255;
+      }
+      ctx.putImageData(id, 0, 0);
+      baseImageData = ctx.getImageData(0, 0, dw, dh);
+      setStatus('');
+    };
+    img.onerror = function () { setStatus('Could not load page ' + n + '.'); };
+    img.src = pageUrl(n);
+  }
+
+  function pushUndo() {
+    try {
+      undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+      if (undoStack.length > 25) undoStack.shift();
+      undoBtn.disabled = false;
+    } catch (e) { /* ignore */ }
+  }
+
+  function floodFill(sx, sy, rgb) {
+    var w = canvas.width, h = canvas.height;
+    if (sx < 0 || sy < 0 || sx >= w || sy >= h) return false;
+    var id = ctx.getImageData(0, 0, w, h);
+    var d = id.data;
+    function idx(x, y) { return (y * w + x) * 4; }
+    var start = idx(sx, sy);
+    // Don't fill if the seed is on a line.
+    if (isLine(d[start], d[start + 1], d[start + 2])) return false;
+    // Don't fill if the region is already exactly this color.
+    if (d[start] === rgb[0] && d[start + 1] === rgb[1] && d[start + 2] === rgb[2]) return false;
+    var stack = [[sx, sy]];
+    var seen = new Uint8Array(w * h);
+    seen[sy * w + sx] = 1;
+    while (stack.length) {
+      var pt = stack.pop();
+      var x = pt[0], y = pt[1];
+      var i = idx(x, y);
+      d[i] = rgb[0]; d[i + 1] = rgb[1]; d[i + 2] = rgb[2]; d[i + 3] = 255;
+      // 4-neighbours
+      if (x > 0 && !seen[y * w + x - 1]) {
+        var li = idx(x - 1, y);
+        if (!isLine(d[li], d[li + 1], d[li + 2])) { seen[y * w + x - 1] = 1; stack.push([x - 1, y]); }
+      }
+      if (x < w - 1 && !seen[y * w + x + 1]) {
+        var ri = idx(x + 1, y);
+        if (!isLine(d[ri], d[ri + 1], d[ri + 2])) { seen[y * w + x + 1] = 1; stack.push([x + 1, y]); }
+      }
+      if (y > 0 && !seen[(y - 1) * w + x]) {
+        var ui = idx(x, y - 1);
+        if (!isLine(d[ui], d[ui + 1], d[ui + 2])) { seen[(y - 1) * w + x] = 1; stack.push([x, y - 1]); }
+      }
+      if (y < h - 1 && !seen[(y + 1) * w + x]) {
+        var di = idx(x, y + 1);
+        if (!isLine(d[di], d[di + 1], d[di + 2])) { seen[(y + 1) * w + x] = 1; stack.push([x, y + 1]); }
+      }
+    }
+    ctx.putImageData(id, 0, 0);
+    return true;
+  }
+
+  function canvasPoint(ev) {
+    var r = canvas.getBoundingClientRect();
+    var cx = (ev.clientX - r.left) * (canvas.width / r.width);
+    var cy = (ev.clientY - r.top) * (canvas.height / r.height);
+    return [Math.floor(cx), Math.floor(cy)];
+  }
+
+  canvas.addEventListener('pointerdown', function (ev) {
+    ev.preventDefault();
+    var pt = canvasPoint(ev);
+    var rgb = erasing ? [255, 255, 255] : hexToRgb(currentColor);
+    pushUndo();
+    var filled = floodFill(pt[0], pt[1], rgb);
+    if (!filled) {
+      // Nothing filled (tapped a line or already that color) — drop the undo snapshot.
+      undoStack.pop();
+      if (!undoStack.length) undoBtn.disabled = true;
+    }
+  });
+
+  eraserBtn.addEventListener('click', function () {
+    erasing = !erasing;
+    eraserBtn.setAttribute('aria-pressed', erasing ? 'true' : 'false');
+    if (erasing) {
+      var all = paletteEl.querySelectorAll('.swatch');
+      for (var k = 0; k < all.length; k++) all[k].setAttribute('aria-pressed', 'false');
+    } else {
+      var first = paletteEl.querySelector('.swatch');
+      if (first) first.setAttribute('aria-pressed', 'true');
+      currentColor = COLORS[0];
+    }
+  });
+
+  undoBtn.addEventListener('click', function () {
+    if (!undoStack.length) return;
+    var prev = undoStack.pop();
+    ctx.putImageData(prev, 0, 0);
+    if (!undoStack.length) undoBtn.disabled = true;
+  });
+
+  clearBtn.addEventListener('click', function () {
+    if (!baseImageData) return;
+    pushUndo();
+    ctx.putImageData(baseImageData, 0, 0);
+  });
+
+  saveBtn.addEventListener('click', function () {
+    canvas.toBlob(function (blob) {
+      if (!blob) { setStatus('Could not save the picture.'); return; }
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'fret-and-ink-coloring-page-' + pad(currentPage) + '.png';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      setStatus('Saved! Check your downloads.');
+    }, 'image/png');
+  });
+
+  loadPage(1);
+})();
+</script>
+</body>
+</html>
