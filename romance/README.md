@@ -2,7 +2,7 @@
 
 An interactive music-themed romance comic that lives behind the **ROMANCE** book on the Fret and Ink Bonus Content bookshelf (member area). Tap or click to turn the pages.
 
-**The story:** June, 24, works at a record store and shoots shows on film. Theo, 26, is the drummer in a local indie band. She's photographed every one of their gigs for a year — and never told him why she keeps coming back. On the night of the band's last local show before their first real tour, he asks her to come on the road as their photographer, and the two of them finally say out loud what the songs have been saying all along. Friends to lovers, 10 pages, ends on a first kiss and a tour bus at dawn.
+**The story:** June, 24, works at a record store. Theo, 26, is the drummer in a local indie band. She's never missed one of their gigs in a year — and never told him why she keeps coming back. On the night of the band's last local show before their first real tour, he asks her to come on the road to run merch, and the two of them finally say out loud what the songs have been saying all along. Friends to lovers, 10 pages, ends on a first kiss and a tour bus at dawn.
 
 **The characters are fully original** — invented for this comic, not based on any real person or on Stefanie's novel.
 

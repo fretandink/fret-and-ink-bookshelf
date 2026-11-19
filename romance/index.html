@@ -239,10 +239,10 @@ var PAGES = [
   {
     title: "1 · The last local show",
     blocks: [
-      { cap: "Theo\u2019s band plays their last local show tonight. After this, it\u2019s three weeks on the road \u2014 and I\u2019ve shot every single one of their gigs." },
+      { cap: "Theo\u2019s band plays their last local show tonight. After this, it\u2019s three weeks on the road \u2014 and I\u2019ve never missed one of their gigs." },
       { img: "panels/p01.webp", bubbles: [] },
       { img: "panels/p02.webp", bubbles: [
-        { who: "June \u00b7 thinking", text: "Same camera. Same pit. So why does tonight feel different?", pos: "bl", thought: true }
+        { who: "June \u00b7 thinking", text: "Same spot. Same denim jacket. So why does tonight feel different?", pos: "bl", thought: true }
       ]}
     ]
   },
@@ -252,7 +252,7 @@ var PAGES = [
       { img: "panels/p03.webp", bubbles: [] },
       { cap: "He plays like the room is on fire. He always has." },
       { img: "panels/p04.webp", bubbles: [
-        { who: "June \u00b7 thinking", text: "One more roll of film. That\u2019s all I need. That\u2019s what I keep telling myself.", pos: "bl", thought: true }
+        { who: "June \u00b7 thinking", text: "One more song. That\u2019s all I need. That\u2019s what I keep telling myself.", pos: "bl", thought: true }
       ]}
     ]
   },
@@ -260,7 +260,7 @@ var PAGES = [
     title: "3 · The look",
     blocks: [
       { img: "panels/p05.webp", bubbles: [
-        { who: "Theo", text: "This one\u2019s for the girl in the pit.", pos: "tl" }
+        { who: "Theo", text: "This one\u2019s for the girl in the front row.", pos: "tl" }
       ]},
       { img: "panels/p06.webp", bubbles: [
         { who: "June \u00b7 thinking", text: "He\u2019s looking at me. He\u2019s actually looking at me.", pos: "br", thought: true }
@@ -274,8 +274,8 @@ var PAGES = [
         { who: "Bandmate", text: "Tour starts Monday! Three weeks, five states!", pos: "tl" }
       ]},
       { img: "panels/p08.webp", bubbles: [
-        { who: "Theo", text: "Come here. Show me what you got tonight.", pos: "tl" },
-        { who: "June", text: "You already know. You\u2019re the only thing I ever aim at.", pos: "br" }
+        { who: "Theo", text: "Come here. What\u2019d you bring me tonight?", pos: "tl" },
+        { who: "June", text: "A first pressing. I pulled it from the shop for you.", pos: "br" }
       ]}
     ]
   },
@@ -283,7 +283,7 @@ var PAGES = [
     title: "5 · The ask",
     blocks: [
       { img: "panels/p09.webp", bubbles: [
-        { who: "Theo", text: "Come on tour with us. As our photographer. I\u2019m serious, June.", pos: "bl" }
+        { who: "Theo", text: "Come on tour with us. Run merch. I\u2019m serious, June.", pos: "bl" }
       ]},
       { img: "panels/p10.webp", bubbles: [
         { who: "June", text: "You want me \u2014 on the bus? For three weeks?", pos: "tl" },
@@ -305,7 +305,7 @@ var PAGES = [
     title: "7 · The truth",
     blocks: [
       { img: "panels/p13.webp", bubbles: [
-        { who: "June", text: "I started shooting your band because I liked the music. I kept coming back because of you.", pos: "bl" }
+        { who: "June", text: "I started coming to your shows because I liked the music. I kept coming back because of you.", pos: "bl" }
       ]},
       { img: "panels/p14.webp", bubbles: [
         { who: "Theo", text: "Say that again. Slowly. I want to remember exactly how you said it.", pos: "bl" }
@@ -334,7 +334,7 @@ var PAGES = [
   {
     title: "10 · Encore",
     blocks: [
-      { cap: "First night of the tour. Same camera. Same pit. Everything different." },
+      { cap: "First night of the tour. Same front row. Everything different." },
       { img: "panels/p19.webp", bubbles: [] },
       { img: "panels/p20.webp", bubbles: [
         { who: "Theo", text: "This one\u2019s called \u2018Encore.\u2019 It\u2019s for June.", pos: "tl" }
@@ -371,7 +371,7 @@ function render() {
     }
   });
   if (current === PAGES.length - 1) {
-    html += '<div class="endcard"><h2>The End</h2><p>June &amp; Theo will return in the next Fret and Ink romance.<br>Same camera. Same pit. New song.</p></div>';
+    html += '<div class="endcard"><h2>The End</h2><p>June &amp; Theo will return in the next Fret and Ink romance.<br>Same front row. New song.</p></div>';
   }
   pageEl.innerHTML = html;
   pagenoEl.textContent = 'Page ' + (current + 1) + ' of ' + PAGES.length;
