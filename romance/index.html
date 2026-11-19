@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Encore — a Fret and Ink romance</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #000; color: #fff; }
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 48px;
+  }
+  /* ---------- header ---------- */
+  header {
+    width: 100%;
+    max-width: 760px;
+    text-align: center;
+    padding: 28px 16px 8px;
+  }
+  header .kicker {
+    color: #FF0175;
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  header h1 {
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: clamp(34px, 8vw, 56px);
+    line-height: 1;
+    color: #FF0175;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 8px 0 6px;
+    text-shadow: 3px 3px 0 #fff;
+  }
+  header .sub {
+    font-style: italic;
+    color: #ffb3d4;
+    font-size: 15px;
+  }
+  header .byline {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #999;
+    font-family: Arial, sans-serif;
+  }
+  /* ---------- progress ---------- */
+  .progress {
+    width: 100%;
+    max-width: 760px;
+    padding: 14px 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .dots { display: flex; gap: 6px; flex: 1; justify-content: center; }
+  .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #333; border: 1px solid #FF0175;
+    cursor: pointer; padding: 0;
+  }
+  .dot.on { background: #FF0175; }
+  .pageno {
+    font-family: Arial, sans-serif;
+    font-size: 13px; color: #FF0175;
+    white-space: nowrap;
+  }
+  /* ---------- page ---------- */
+  #page {
+    width: 100%;
+    max-width: 760px;
+    padding: 16px 16px 0;
+  }
+  .pagetitle {
+    font-family: 'Arial Black', Arial, sans-serif;
+    color: #FF0175;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .caption {
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.55;
+    color: #f5e6ee;
+    border-left: 3px solid #FF0175;
+    padding: 2px 0 2px 14px;
+    margin: 14px 0;
+  }
+  .caption:first-child { margin-top: 0; }
+  .panel {
+    position: relative;
+    margin: 0 0 16px;
+    border: 3px solid #FF0175;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #111;
+  }
+  .panel img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  /* ---------- speech bubbles (HTML overlays) ---------- */
+  .bubble {
+    position: absolute;
+    max-width: 78%;
+    background: #fff;
+    color: #000;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    line-height: 1.35;
+    padding: 10px 14px;
+    border-radius: 18px;
+    border: 2px solid #000;
+    box-shadow: 3px 3px 0 #FF0175;
+    z-index: 2;
+  }
+  .bubble .who {
+    display: block;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #FF0175;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .bubble.thought {
+    background: #ffe3f0;
+    border-radius: 24px;
+    font-style: italic;
+  }
+  .bubble.tl { top: 12px; left: 12px; }
+  .bubble.tr { top: 12px; right: 12px; }
+  .bubble.bl { bottom: 12px; left: 12px; }
+  .bubble.br { bottom: 12px; right: 12px; }
+  .bubble.tc { top: 12px; left: 50%; transform: translateX(-50%); }
+  .bubble.bc { bottom: 12px; left: 50%; transform: translateX(-50%); }
+  /* ---------- controls ---------- */
+  .controls {
+    width: 100%;
+    max-width: 760px;
+    padding: 8px 16px 0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .controls button {
+    font-family: 'Arial Black', Arial, sans-serif;
+    font-size: 15px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    background: #FF0175;
+    color: #000;
+    border: 2px solid #FF0175;
+    border-radius: 999px;
+    padding: 12px 22px;
+    cursor: pointer;
+  }
+  .controls button:disabled { opacity: .35; cursor: default; }
+  .controls button.ghost {
+    background: #000;
+    color: #FF0175;
+  }
+  .hint {
+    text-align: center;
+    color: #777;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    margin-top: 14px;
+    padding: 0 16px;
+  }
+  .backlink {
+    margin-top: 26px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #FF0175;
+    text-decoration: none;
+    border-bottom: 1px solid #FF0175;
+    padding-bottom: 2px;
+  }
+  /* ---------- end card ---------- */
+  .endcard {
+    text-align: center;
+    padding: 30px 16px;
+  }
+  .endcard h2 {
+    font-family: 'Arial Black', Arial, sans-serif;
+    color: #FF0175;
+    font-size: 30px;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #fff;
+    margin-bottom: 10px;
+  }
+  .endcard p { font-style: italic; color: #f5e6ee; font-size: 17px; line-height: 1.6; }
+  @media (max-width: 480px) {
+    .bubble { font-size: 13px; padding: 8px 11px; max-width: 84%; }
+    .caption { font-size: 16px; }
+    .controls button { padding: 11px 16px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">Fret and Ink presents</div>
+  <h1>Encore</h1>
+  <div class="sub">A music romance in ten pages — June &amp; Theo</div>
+  <div class="byline">Tap or click to turn the page &middot; Best friends. One tour. One song.</div>
+</header>
+
+<div class="progress">
+  <span class="pageno" id="pageno">Page 1 of 10</span>
+  <div class="dots" id="dots"></div>
+  <button class="dot" style="display:none"></button>
+</div>
+
+<main id="page" aria-live="polite"></main>
+
+<div class="controls">
+  <button id="prevBtn" type="button">&larr; Back</button>
+  <button id="restartBtn" type="button" class="ghost">Restart</button>
+  <button id="nextBtn" type="button">Next &rarr;</button>
+</div>
+
+<div class="hint">Tip: tap the page, use the arrow keys, or swipe left / right.</div>
+<a class="backlink" href="../index.html">&larr; Back to the bookshelf</a>
+
+<script>
+var PAGES = [
+  {
+    title: "1 · The last local show",
+    blocks: [
+      { cap: "Theo\u2019s band plays their last local show tonight. After this, it\u2019s three weeks on the road \u2014 and I\u2019ve shot every single one of their gigs." },
+      { img: "panels/p01.webp", bubbles: [] },
+      { img: "panels/p02.webp", bubbles: [
+        { who: "June \u00b7 thinking", text: "Same camera. Same pit. So why does tonight feel different?", pos: "bl", thought: true }
+      ]}
+    ]
+  },
+  {
+    title: "2 · The band",
+    blocks: [
+      { img: "panels/p03.webp", bubbles: [] },
+      { cap: "He plays like the room is on fire. He always has." },
+      { img: "panels/p04.webp", bubbles: [
+        { who: "June \u00b7 thinking", text: "One more roll of film. That\u2019s all I need. That\u2019s what I keep telling myself.", pos: "bl", thought: true }
+      ]}
+    ]
+  },
+  {
+    title: "3 · The look",
+    blocks: [
+      { img: "panels/p05.webp", bubbles: [
+        { who: "Theo", text: "This one\u2019s for the girl in the pit.", pos: "tl" }
+      ]},
+      { img: "panels/p06.webp", bubbles: [
+        { who: "June \u00b7 thinking", text: "He\u2019s looking at me. He\u2019s actually looking at me.", pos: "br", thought: true }
+      ]}
+    ]
+  },
+  {
+    title: "4 · Backstage",
+    blocks: [
+      { img: "panels/p07.webp", bubbles: [
+        { who: "Bandmate", text: "Tour starts Monday! Three weeks, five states!", pos: "tl" }
+      ]},
+      { img: "panels/p08.webp", bubbles: [
+        { who: "Theo", text: "Come here. Show me what you got tonight.", pos: "tl" },
+        { who: "June", text: "You already know. You\u2019re the only thing I ever aim at.", pos: "br" }
+      ]}
+    ]
+  },
+  {
+    title: "5 · The ask",
+    blocks: [
+      { img: "panels/p09.webp", bubbles: [
+        { who: "Theo", text: "Come on tour with us. As our photographer. I\u2019m serious, June.", pos: "bl" }
+      ]},
+      { img: "panels/p10.webp", bubbles: [
+        { who: "June", text: "You want me \u2014 on the bus? For three weeks?", pos: "tl" },
+        { who: "Theo", text: "I want you everywhere. I mean \u2014 on tour. I mean on tour.", pos: "br" }
+      ]}
+    ]
+  },
+  {
+    title: "6 · The rooftop",
+    blocks: [
+      { cap: "We ended up on the roof. The city looked like it was holding its breath." },
+      { img: "panels/p11.webp", bubbles: [] },
+      { img: "panels/p12.webp", bubbles: [
+        { who: "Theo", text: "The new songs? The ones I\u2019ve been writing? They\u2019re all about you. Every one of them.", pos: "bl" }
+      ]}
+    ]
+  },
+  {
+    title: "7 · The truth",
+    blocks: [
+      { img: "panels/p13.webp", bubbles: [
+        { who: "June", text: "I started shooting your band because I liked the music. I kept coming back because of you.", pos: "bl" }
+      ]},
+      { img: "panels/p14.webp", bubbles: [
+        { who: "Theo", text: "Say that again. Slowly. I want to remember exactly how you said it.", pos: "bl" }
+      ]}
+    ]
+  },
+  {
+    title: "8 · The kiss",
+    blocks: [
+      { img: "panels/p15.webp", bubbles: [] },
+      { cap: "And then there was no more talking." },
+      { img: "panels/p16.webp", bubbles: [] },
+      { cap: "It felt like the last song of the set \u2014 the one the whole room\u2019s been waiting for." }
+    ]
+  },
+  {
+    title: "9 · The morning after",
+    blocks: [
+      { cap: "6 a.m. The bus leaves at seven." },
+      { img: "panels/p17.webp", bubbles: [] },
+      { img: "panels/p18.webp", bubbles: [
+        { who: "Theo", text: "I wrote your name on the setlist. First song, every night. It\u2019s yours.", pos: "bl" }
+      ]}
+    ]
+  },
+  {
+    title: "10 · Encore",
+    blocks: [
+      { cap: "First night of the tour. Same camera. Same pit. Everything different." },
+      { img: "panels/p19.webp", bubbles: [] },
+      { img: "panels/p20.webp", bubbles: [
+        { who: "Theo", text: "This one\u2019s called \u2018Encore.\u2019 It\u2019s for June.", pos: "tl" }
+      ]},
+      { cap: "And the crowd went wild. So did I." }
+    ]
+  }
+];
+
+var current = 0;
+var pageEl = document.getElementById('page');
+var pagenoEl = document.getElementById('pageno');
+var dotsEl = document.getElementById('dots');
+var prevBtn = document.getElementById('prevBtn');
+var nextBtn = document.getElementById('nextBtn');
+var restartBtn = document.getElementById('restartBtn');
+
+function esc(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function render() {
+  var p = PAGES[current];
+  var html = '<div class="pagetitle">' + esc(p.title) + '</div>';
+  p.blocks.forEach(function (b) {
+    if (b.cap) {
+      html += '<p class="caption">' + esc(b.cap) + '</p>';
+    } else if (b.img) {
+      html += '<figure class="panel"><img src="' + b.img + '" alt="Comic panel" loading="eager">';
+      (b.bubbles || []).forEach(function (bb) {
+        html += '<div class="bubble ' + (bb.thought ? 'thought ' : '') + esc(bb.pos) + '"><span class="who">' + esc(bb.who) + '</span>' + esc(bb.text) + '</div>';
+      });
+      html += '</figure>';
+    }
+  });
+  if (current === PAGES.length - 1) {
+    html += '<div class="endcard"><h2>The End</h2><p>June &amp; Theo will return in the next Fret and Ink romance.<br>Same camera. Same pit. New song.</p></div>';
+  }
+  pageEl.innerHTML = html;
+  pagenoEl.textContent = 'Page ' + (current + 1) + ' of ' + PAGES.length;
+  prevBtn.disabled = current === 0;
+  nextBtn.disabled = current === PAGES.length - 1;
+  var dots = dotsEl.querySelectorAll('.dot');
+  dots.forEach(function (d, i) { d.classList.toggle('on', i === current); });
+  try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
+}
+
+PAGES.forEach(function (_, i) {
+  var d = document.createElement('button');
+  d.type = 'button';
+  d.className = 'dot';
+  d.setAttribute('aria-label', 'Go to page ' + (i + 1));
+  d.addEventListener('click', function (e) { e.stopPropagation(); go(i); });
+  dotsEl.appendChild(d);
+});
+
+function go(i) {
+  if (i < 0) i = 0;
+  if (i > PAGES.length - 1) i = PAGES.length - 1;
+  current = i;
+  render();
+}
+function next() { if (current < PAGES.length - 1) go(current + 1); }
+function prev() { if (current > 0) go(current - 1); }
+
+nextBtn.addEventListener('click', next);
+prevBtn.addEventListener('click', prev);
+restartBtn.addEventListener('click', function () { go(0); });
+pageEl.addEventListener('click', function (e) {
+  if (e.target.closest('.dot')) return;
+  next();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'ArrowRight') next();
+  if (e.key === 'ArrowLeft') prev();
+});
+var touchX = null;
+document.addEventListener('touchstart', function (e) { touchX = e.changedTouches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', function (e) {
+  if (touchX === null) return;
+  var dx = e.changedTouches[0].clientX - touchX;
+  if (dx < -40) next();
+  if (dx > 40) prev();
+  touchX = null;
+}, { passive: true });
+
+render();
+</script>
+</body>
+</html>
