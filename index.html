@@ -150,7 +150,7 @@
   <div class="hotzone" style="left:56.63%;top:44.34%;width:8%;height:26%;--zw:8"><button type="button" class="hotspot" aria-label="Shoot It on Film"><span class="pill">Shoot It on Film</span></button></div>
   <div class="hotzone" style="left:65.3%;top:44.34%;width:8%;height:26%;--zw:8"><button type="button" class="hotspot" aria-label="Write Your First Review"><span class="pill">Write Your First Review</span></button></div>
   <div class="hotzone" style="left:78.82%;top:52.83%;width:11%;height:4.2%;--zw:11"><a class="hotspot" href="coloring/index.html" aria-label="Coloring"><span class="pill">Coloring</span></a></div>
-  <div class="hotzone" style="left:78.82%;top:57.47%;width:11%;height:4.2%;--zw:11"><button type="button" class="hotspot" aria-label="Build a Battle Vest"><span class="pill">Build a Battle Vest</span></button></div>
+  <div class="hotzone" style="left:78.82%;top:57.47%;width:11%;height:4.2%;--zw:11"><button type="button" class="hotspot" aria-label="Build a Battle Vest" data-modal="battlevest"><span class="pill">Build a Battle Vest</span></button></div>
   <div class="hotzone" style="left:78.82%;top:61.85%;width:11%;height:4.2%;--zw:11"><button type="button" class="hotspot" aria-label="The Perfect Playlist"><span class="pill">The Perfect Playlist</span></button></div>
   <!-- Bottom shelf: game boxes (named for their games) -->
   <div class="hotzone" style="left:25.52%;top:81.42%;width:10%;height:20%;--zw:10"><button type="button" class="hotspot" aria-label="Memory Match" data-modal="memory"><span class="pill">Memory Match</span></button></div>
@@ -2253,6 +2253,17 @@
     </div>
 
     
+  </div>
+</template>
+
+<!-- Battle Vest tutorial: YouTube video embedded in the shared modal. -->
+<template id="tpl-battlevest">
+  <div class="game-root" style="background:#000; color:#fff; font-family:'DM Sans', system-ui, sans-serif; padding:28px 28px 36px; box-sizing:border-box;">
+    <h2 style="font-family:'Archivo Black', sans-serif; color:#FF0175; font-size:28px; margin:0 0 10px; line-height:1.15;">Build a Battle Vest</h2>
+    <p style="font-size:16px; line-height:1.55; color:#fff; margin:0 0 18px; max-width:720px;">Here&rsquo;s the best step-by-step we found for building your own battle vest &mdash; pick your vest, lay out your patches, sew them on, then studs, pins and chains. Make it yours.</p>
+    <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; max-width:960px; background:#000;">
+      <iframe src="https://www.youtube.com/embed/tlBAQhmxOis" title="Build a Battle Vest tutorial" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
   </div>
 </template>
 
@@ -7739,6 +7750,9 @@ window.__games["scramble"] = function (document, window) {
     modal.style.display = 'none';
     modal.classList.remove('open');
     document.body.style.overflow = '';
+    // Stop any embedded video (e.g. a tutorial) so it doesn't keep playing after close.
+    var frames = mount.querySelectorAll('iframe');
+    for (var i = 0; i < frames.length; i++) { frames[i].src = frames[i].src; }
   }
   // The WHOLE hover zone is the tap target, not just the dot.
   var zones = document.querySelectorAll('.hotzone');
