@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bonus Content Bookshelf — Fret and Ink</title>
+<title>Bonus Content — Fret and Ink</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { background: #000 !important; }
   .shelf {
     position: relative;
     width: 100%;
-    aspect-ratio: 1741 / 1262;
+    aspect-ratio: 1920 / 1280;
     background: #000;
     overflow: hidden;
   }
@@ -21,12 +21,8 @@
     height: 100%;
     display: block;
   }
-  /* Pure-black bars covering the white bands baked into the image edges */
-  .edge-bar { position: absolute; left: 0; width: 100%; background: #000; pointer-events: none; z-index: 1; }
-  .edge-top { top: 0; height: 1.27%; }
-  .edge-bottom { bottom: 0; height: 1.99%; }
-  .edge-left { left: 0; top: 0; width: 1.0%; height: 100%; }
-  .edge-right { left: auto; right: 0; top: 0; width: 1.0%; height: 100%; }
+  /* Pure-black bars covering the white bands baked into the image edges.
+     (Unused now: the punk bedroom image is full-bleed with no white bands.) */
   /* Hover zones: transparent hit areas over each book spine / game box.
      The pink dot is hidden until its book is hovered (green-room style). */
   .hotzone { position: absolute; transform: translate(-50%, -50%); z-index: 2; cursor: pointer; touch-action: manipulation; }
@@ -35,17 +31,15 @@
     position: absolute;
     display: block;
     /* NOTE: % width resolves against the hotzone, NOT the shelf. The zone is
-       --zw % of the shelf wide, so 210% / --zw == 2.1% of the shelf (~36px).
+       --zw % of the shelf wide, so 210% / --zw == 2.1% of the shelf (~40px).
        A plain 2.1% here made 4px dots nobody could tap. */
     width: calc(210% / var(--zw, 8));
     aspect-ratio: 1 / 1;
     transform: translate(-50%, -50%);
-    /* The dot's PAINT is transparent until hover (green-room style: nothing
-       shows on the shelf), but the button itself stays opacity:1 — an
-       opacity:0 control is unreachable for touch/keyboard tooling even
-       though the zone around it takes the tap. Same look, operable button. */
-    background: transparent;
-    border: 2px solid transparent;
+    /* Room style (matches Glam Room / Plugged In): solid hot-pink dot with a
+       white border, visible by default; only the glow + pill appear on hover. */
+    background: #FF0175;
+    border: 2px solid #fff;
     border-radius: 50%;
     padding: 0;
     cursor: pointer;
@@ -127,37 +121,20 @@
 </head>
 <body>
 <div class="shelf">
-  <img src="bookshelf-tight-1741x1262.webp" alt="Fret and Ink Afterparty bookshelf: 18 activity books and 5 game boxes on three shelves">
-  <div class="edge-bar edge-top" aria-hidden="true"></div>
-  <div class="edge-bar edge-bottom" aria-hidden="true"></div>
-  <div class="edge-bar edge-left" aria-hidden="true"></div>
-  <div class="edge-bar edge-right" aria-hidden="true"></div>
-  <!-- Top shelf -->
-  <div class="hotzone" style="left:16.34%;top:16.01%;width:8%;height:30%;--zw:8"><button type="button" class="hotspot" aria-label="Music Crosswords" data-modal="crossword"><span class="pill">Music Crosswords</span></button></div>
-  <div class="hotzone" style="left:30.11%;top:13.95%;width:8%;height:30%;--zw:8"><button type="button" class="hotspot" aria-label="Music Word Search" data-modal="wordsearch"><span class="pill">Music Word Search</span></button></div>
-  <div class="hotzone" style="left:39.8%;top:13.95%;width:8%;height:30%;--zw:8"><button type="button" class="hotspot" aria-label="Shoot the Show"><span class="pill">Shoot the Show</span></button></div>
-  <div class="hotzone" style="left:53.32%;top:21.93%;width:11%;height:3.4%;--zw:11"><button type="button" class="hotspot" aria-label="How to Get the Ticket"><span class="pill">How to Get the Ticket</span></button></div>
-  <div class="hotzone" style="left:53.32%;top:25.54%;width:11%;height:3.4%;--zw:11"><button type="button" class="hotspot" aria-label="Making Fan Art"><span class="pill">Making Fan Art</span></button></div>
-  <div class="hotzone" style="left:53.32%;top:29.14%;width:11%;height:3.4%;--zw:11"><button type="button" class="hotspot" aria-label="Front Row Survival"><span class="pill">Front Row Survival</span></button></div>
-  <div class="hotzone" style="left:65.81%;top:14.98%;width:8%;height:30%;--zw:8"><button type="button" class="hotspot" aria-label="Rock on a Budget"><span class="pill">Rock on a Budget</span></button></div>
-  <div class="hotzone" style="left:76.01%;top:13.33%;width:8%;height:30%;--zw:8"><button type="button" class="hotspot" aria-label="The Concert Journal"><span class="pill">The Concert Journal</span></button></div>
-  <div class="hotzone pill-in" style="left:85.19%;top:13.33%;width:8%;height:30%;--zw:8"><button type="button" class="hotspot" aria-label="Start Your Own Zine"><span class="pill">Start Your Own Zine</span></button></div>
-  <!-- Middle shelf -->
-  <div class="hotzone" style="left:18.38%;top:43.31%;width:8%;height:26%;--zw:8"><button type="button" class="hotspot" aria-label="How to Launch a Podcast"><span class="pill">How to Launch a Podcast</span></button></div>
-  <div class="hotzone" style="left:29.6%;top:42.79%;width:8%;height:26%;--zw:8"><button type="button" class="hotspot" aria-label="Vinyl 101"><span class="pill">Vinyl 101</span></button></div>
-  <div class="hotzone" style="left:38.78%;top:44.34%;width:8%;height:26%;--zw:8"><button type="button" class="hotspot" aria-label="Styling Your Merch"><span class="pill">Styling Your Merch</span></button></div>
-  <div class="hotzone" style="left:47.96%;top:45.37%;width:8%;height:26%;--zw:8"><button type="button" class="hotspot" aria-label="The Setlist Collector"><span class="pill">The Setlist Collector</span></button></div>
-  <div class="hotzone" style="left:56.63%;top:44.34%;width:8%;height:26%;--zw:8"><button type="button" class="hotspot" aria-label="Shoot It on Film"><span class="pill">Shoot It on Film</span></button></div>
-  <div class="hotzone" style="left:65.3%;top:44.34%;width:8%;height:26%;--zw:8"><button type="button" class="hotspot" aria-label="Write Your First Review"><span class="pill">Write Your First Review</span></button></div>
-  <div class="hotzone" style="left:78.82%;top:52.83%;width:11%;height:4.2%;--zw:11"><a class="hotspot" href="coloring/index.html" aria-label="Coloring"><span class="pill">Coloring</span></a></div>
-  <div class="hotzone" style="left:78.82%;top:57.47%;width:11%;height:4.2%;--zw:11"><button type="button" class="hotspot" aria-label="Build a Battle Vest" data-modal="battlevest"><span class="pill">Build a Battle Vest</span></button></div>
-  <div class="hotzone" style="left:78.82%;top:61.85%;width:11%;height:4.2%;--zw:11"><button type="button" class="hotspot" aria-label="The Perfect Playlist"><span class="pill">The Perfect Playlist</span></button></div>
-  <!-- Bottom shelf: game boxes (named for their games) -->
-  <div class="hotzone" style="left:25.52%;top:81.42%;width:10%;height:20%;--zw:10"><button type="button" class="hotspot" aria-label="Memory Match" data-modal="memory"><span class="pill">Memory Match</span></button></div>
-  <div class="hotzone" style="left:35.72%;top:81.42%;width:10%;height:20%;--zw:10"><button type="button" class="hotspot" aria-label="Mad Libs" data-modal="madlibs"><span class="pill">Mad Libs</span></button></div>
-  <div class="hotzone" style="left:45.92%;top:81.42%;width:10%;height:20%;--zw:10"><button type="button" class="hotspot" aria-label="I-Spy" data-modal="ispy"><span class="pill">I-Spy</span></button></div>
-  <div class="hotzone" style="left:56.12%;top:81.42%;width:10%;height:20%;--zw:10"><button type="button" class="hotspot" aria-label="Word Scramble" data-modal="scramble"><span class="pill">Word Scramble</span></button></div>
-  <div class="hotzone" style="left:66.32%;top:81.42%;width:10%;height:20%;--zw:10"><button type="button" class="hotspot" aria-label="Jigsaw" data-modal="jigsaw"><span class="pill">Jigsaw</span></button></div>
+  <img src="punk-bedroom-room.png" alt="Fret and Ink Bonus Content punk bedroom: bed, record player, desk with coloring book and puzzles, shelf of game boxes, and a battle vest on a chair">
+  <!-- Shelf: game boxes (top row) -->
+  <div class="hotzone" style="left:70%;top:14%;width:11%;height:6%;--zw:11"><button type="button" class="hotspot" aria-label="Music Crosswords" data-modal="crossword"><span class="pill">Music Crosswords</span></button></div>
+  <div class="hotzone" style="left:82%;top:14%;width:11%;height:6%;--zw:11"><button type="button" class="hotspot" aria-label="Music Word Search" data-modal="wordsearch"><span class="pill">Music Word Search</span></button></div>
+  <div class="hotzone pill-in" style="left:92%;top:15%;width:11%;height:6%;--zw:11"><button type="button" class="hotspot" aria-label="Mad Libs" data-modal="madlibs"><span class="pill">Mad Libs</span></button></div>
+  <!-- Shelf: game boxes (bottom row) -->
+  <div class="hotzone" style="left:70%;top:21%;width:11%;height:6%;--zw:11"><button type="button" class="hotspot" aria-label="Word Scramble" data-modal="scramble"><span class="pill">Word Scramble</span></button></div>
+  <div class="hotzone" style="left:82%;top:21%;width:11%;height:6%;--zw:11"><button type="button" class="hotspot" aria-label="I-Spy" data-modal="ispy"><span class="pill">I-Spy</span></button></div>
+  <div class="hotzone pill-in" style="left:93%;top:22%;width:11%;height:6%;--zw:11"><button type="button" class="hotspot" aria-label="Memory Match" data-modal="memory"><span class="pill">Memory Match</span></button></div>
+  <!-- Desk: open coloring book + puzzle pieces -->
+  <div class="hotzone" style="left:72%;top:41%;width:14%;height:12%;--zw:14"><a class="hotspot" href="coloring/index.html" aria-label="Coloring"><span class="pill">Coloring</span></a></div>
+  <div class="hotzone" style="left:70%;top:53%;width:12%;height:7%;--zw:12"><button type="button" class="hotspot" aria-label="Jigsaw" data-modal="jigsaw"><span class="pill">Jigsaw</span></button></div>
+  <!-- Chair: battle vest -->
+  <div class="hotzone" style="left:84%;top:60%;width:11%;height:14%;--zw:11"><button type="button" class="hotspot" aria-label="Build a Battle Vest" data-modal="battlevest"><span class="pill">Build a Battle Vest</span></button></div>
 </div>
 
 <!-- Shared game popup: whichever game was tapped mounts here, in-page. -->
